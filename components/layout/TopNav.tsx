@@ -4,6 +4,7 @@
 import { useState, useCallback, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   Menu,
@@ -32,6 +33,16 @@ export function TopNav({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const res = await fetch("/api/settings");
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data;
+    },
+  });
 
   const handleLogout = useCallback(async () => {
     try {
@@ -166,15 +177,23 @@ export function TopNav({
                 border: "1.5px solid #C7D2FE",
               }}
             >
-              <span style={{ color: "#4F46E5", fontSize: "0.75rem", fontWeight: 700 }}>
-                {session?.user?.name?.charAt(0)?.toUpperCase() || "A"}
-              </span>
+              {settings?.logoImage ? (
+                <img
+                  src={settings.logoImage}
+                  alt="Logo"
+                  style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "50%" }}
+                />
+              ) : (
+                <span style={{ color: "#4F46E5", fontSize: "0.75rem", fontWeight: 700 }}>
+                  {session?.user?.name?.charAt(0)?.toUpperCase() || "A"}
+                </span>
+              )}
             </div>
             <span
               style={{ fontSize: "0.875rem", fontWeight: 600, color: "#0F172A" }}
               className="hidden sm:block"
             >
-              {session?.user?.name || "Admin"}
+              {settings?.businessName || session?.user?.name || "Admin"}
             </span>
             <ChevronDown style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
           </button>
