@@ -247,7 +247,45 @@ const styles = StyleSheet.create({
   totalText: {
     fontSize: 9,
     fontWeight: "bold",
-    color: "#2B6CB0",
+    fontFamily: "Helvetica-Bold",
+  },
+
+  // Payment Details Section
+  paymentContainer: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  paymentTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#1E293B",
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+    paddingBottom: 4,
+  },
+  paymentGrid: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    gap: 40,
+  },
+  paymentColumn: {
+    flex: 1,
+  },
+  paymentHeader: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#334155",
+    marginBottom: 4,
+  },
+  paymentText: {
+    fontSize: 9,
+    color: "#475569",
+    marginBottom: 2,
   },
 
   // Footer Section
@@ -474,6 +512,34 @@ export function LedgerPdfDocument({ customer, transactions, business, dateRange 
             <Text style={[styles.colBal, styles.totalText, styles.textRight]}>{formatCurrency(currentOutstanding)}</Text>
           </View>
         </View>
+
+        {/* 5.5 PAYMENT DETAILS */}
+        {(business?.bankName || business?.upiId) && (
+          <View style={styles.paymentContainer} wrap={false}>
+            <Text style={styles.paymentTitle}>Payment Instructions</Text>
+            <View style={styles.paymentGrid}>
+              {/* Bank Details */}
+              {(business?.bankName || business?.bankAccount || business?.bankIfsc) && (
+                <View style={styles.paymentColumn}>
+                  <Text style={styles.paymentHeader}>Bank Transfer</Text>
+                  {business?.bankName && <Text style={styles.paymentText}>Bank Name: {business.bankName}</Text>}
+                  {business?.bankAccount && <Text style={styles.paymentText}>Account Number: {business.bankAccount}</Text>}
+                  {business?.bankIfsc && <Text style={styles.paymentText}>IFSC Code: {business.bankIfsc}</Text>}
+                </View>
+              )}
+              {/* UPI Details */}
+              {business?.upiId && (
+                <View style={[styles.paymentColumn, { borderLeftWidth: 1, borderLeftColor: "#E2E8F0", paddingLeft: 20 }]}>
+                  <Text style={styles.paymentHeader}>UPI Payment</Text>
+                  <Text style={styles.paymentText}>UPI ID: {business.upiId}</Text>
+                  {business?.upiQrImage && (
+                    <Image src={business.upiQrImage} style={{ width: 80, height: 80, marginTop: 6, objectFit: "contain" }} />
+                  )}
+                </View>
+              )}
+            </View>
+          </View>
+        )}
 
         {/* 6. FOOTER */}
         <View style={styles.footerContainer}>
