@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   Building2, CreditCard, QrCode, Upload, X, Save, Lock,
-  Eye, EyeOff, Loader2,
+  Eye, EyeOff, Loader2, Download
 } from "lucide-react";
 import { businessSettingsSchema, type BusinessSettingsInput } from "@/lib/validations";
 import { fileToBase64 } from "@/lib/utils";
@@ -116,7 +116,10 @@ export default function SettingsPage() {
           {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: "64px", borderRadius: "16px" }} />)}
         </div>
       ) : activeTab === "security" ? (
-        <ChangePasswordSection />
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <ChangePasswordSection />
+          <DataBackupSection />
+        </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           {/* Business Info */}
@@ -262,6 +265,37 @@ function ChangePasswordSection() {
           {isLoading ? "Changing..." : "Change Password"}
         </button>
       </form>
+    </div>
+  );
+}
+
+function DataBackupSection() {
+  const handleDownloadBackup = () => {
+    window.open("/api/backup", "_blank");
+  };
+
+  return (
+    <div className="premium-card" style={{ padding: "28px" }}>
+      <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>Data & Backups</h3>
+      <p style={{ fontSize: "0.875rem", color: "#64748B", marginBottom: "20px" }}>
+        Download a complete JSON export of all your customers, transactions, items, and settings. Store this file securely.
+      </p>
+      <button
+        type="button"
+        onClick={handleDownloadBackup}
+        style={{
+          display: "flex", alignItems: "center", gap: "8px",
+          padding: "10px 16px", borderRadius: "10px",
+          background: "#F1F5F9", color: "#0F172A",
+          border: "1px solid #E2E8F0", fontSize: "0.875rem", fontWeight: 600,
+          cursor: "pointer", transition: "all 0.2s"
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "#E2E8F0")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "#F1F5F9")}
+      >
+        <Download style={{ width: "16px", height: "16px" }} />
+        Download Complete Backup
+      </button>
     </div>
   );
 }

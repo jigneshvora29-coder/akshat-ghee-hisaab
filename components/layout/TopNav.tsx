@@ -114,36 +114,10 @@ export function TopNav({
         }}
         aria-label="Open search"
       >
-        <Search style={{ width: "16px", height: "16px", flexShrink: 0 }} />
-        <span className="hidden sm:block">Search customers, transactions...</span>
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "4px" }}>
-          <kbd
-            style={{
-              fontSize: "0.6875rem",
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "4px",
-              padding: "1px 6px",
-              fontFamily: "monospace",
-              color: "#94A3B8",
-            }}
-          >
-            <Command style={{ width: "12px", height: "12px", display: "inline" }} />
-          </kbd>
-          <kbd
-            style={{
-              fontSize: "0.6875rem",
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "4px",
-              padding: "1px 6px",
-              fontFamily: "monospace",
-              color: "#94A3B8",
-            }}
-          >
-            K
-          </kbd>
-        </div>
+        <Search style={{ width: "16px", height: "16px", color: "#94A3B8" }} />
+        <span style={{ fontSize: "0.875rem", color: "#64748B", flex: 1, textAlign: "left" }}>
+          Search...
+        </span>
       </button>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
