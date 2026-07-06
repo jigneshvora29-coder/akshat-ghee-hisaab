@@ -283,16 +283,76 @@ function DashboardSkeleton() {
           <div className="skeleton" style={{ height: "32px", width: "160px", marginBottom: "8px" }} />
           <div className="skeleton" style={{ height: "16px", width: "256px" }} />
         </div>
-        <div className="skeleton" style={{ height: "40px", width: "128px", borderRadius: "12px" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div className="skeleton" style={{ height: "40px", width: "105px", borderRadius: "12px" }} />
+          <div className="skeleton" style={{ height: "40px", width: "145px", borderRadius: "12px" }} />
+        </div>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="skeleton" style={{ height: "96px", borderRadius: "16px" }} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
+          <div
+            key={i}
+            className="premium-card"
+            style={{
+              padding: "20px",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "4px", borderRadius: "0 4px 4px 0", background: "#E2E8F0" }} />
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+              <div>
+                <div className="skeleton" style={{ height: "12px", width: "100px", borderRadius: "4px", marginBottom: "8px" }} />
+                <div className="skeleton" style={{ height: "24px", width: "120px", borderRadius: "4px" }} />
+              </div>
+              <div className="skeleton" style={{ width: "36px", height: "36px", borderRadius: "12px", flexShrink: 0, marginLeft: "8px" }} />
+            </div>
+          </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="skeleton" style={{ height: "256px", borderRadius: "16px" }} />
-        <div className="skeleton" style={{ height: "256px", borderRadius: "16px" }} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Transactions Skeleton */}
+        <div className="premium-card lg:col-span-2" style={{ padding: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+            <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#0F172A" }}>Recent Transactions</h2>
+            <div className="skeleton" style={{ height: "16px", width: "64px", borderRadius: "4px" }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {[...Array(8)].map((_, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="skeleton" style={{ width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="skeleton" style={{ height: "14px", width: "140px", borderRadius: "4px", marginBottom: "4px" }} />
+                  <div className="skeleton" style={{ height: "12px", width: "100px", borderRadius: "4px" }} />
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div className="skeleton" style={{ height: "14px", width: "60px", borderRadius: "4px", marginBottom: "4px", marginLeft: "auto" }} />
+                  <div className="skeleton" style={{ height: "10px", width: "50px", borderRadius: "4px", marginLeft: "auto" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Top Pending Skeleton */}
+        <div className="premium-card" style={{ padding: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+            <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#0F172A" }}>Top Pending</h2>
+            <div className="skeleton" style={{ height: "16px", width: "64px", borderRadius: "4px" }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {[...Array(8)].map((_, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "8px", margin: "0 -8px" }}>
+                <div className="skeleton" style={{ width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="skeleton" style={{ height: "14px", width: "120px", borderRadius: "4px", marginBottom: "4px" }} />
+                  <div className="skeleton" style={{ height: "12px", width: "80px", borderRadius: "4px" }} />
+                </div>
+                <div className="skeleton" style={{ height: "14px", width: "60px", borderRadius: "4px", flexShrink: 0 }} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -9,12 +9,12 @@ export async function GET() {
     const token = cookieStore.get("ghee-hisaab-session")?.value;
 
     if (!token) {
-      return NextResponse.json({ user: null }, { status: 401 });
+      return NextResponse.json({ user: null }, { status: 200 });
     }
 
     const payload = await verifyToken(token);
     if (!payload || !payload.userId) {
-      return NextResponse.json({ user: null }, { status: 401 });
+      return NextResponse.json({ user: null }, { status: 200 });
     }
 
     const user = await prisma.user.findUnique({
@@ -23,7 +23,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ user: null }, { status: 401 });
+      return NextResponse.json({ user: null }, { status: 200 });
     }
 
     return NextResponse.json({ user });

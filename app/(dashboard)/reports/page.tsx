@@ -408,10 +408,37 @@ export default function ReportsPage() {
 function ReportsSkeleton() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* KPI Cards Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: "100px", borderRadius: "16px" }} />)}
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="premium-card" style={{ padding: "20px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+              <div>
+                <div className="skeleton" style={{ height: "12px", width: "100px", borderRadius: "4px", marginBottom: "8px" }} />
+                <div className="skeleton" style={{ height: "24px", width: "140px", borderRadius: "6px" }} />
+              </div>
+              <div className="skeleton" style={{ width: "40px", height: "40px", borderRadius: "12px" }} />
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="skeleton" style={{ height: "400px", borderRadius: "16px" }} />
+
+      {/* Tabs Skeleton */}
+      <div style={{ borderBottom: "1px solid #E2E8F0", display: "flex", gap: "24px", marginBottom: "8px" }}>
+        {["Overview", "Analytics", "Top Customers", "Recent Activity"].map((label, i) => (
+          <div key={i} style={{ padding: "12px 0" }}>
+            <div className="skeleton" style={{ height: "16px", width: `${label.length * 8}px`, borderRadius: "4px" }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Tab Content Skeleton */}
+      <div className="premium-card" style={{ padding: "24px" }}>
+        <div className="skeleton" style={{ height: "20px", width: "160px", borderRadius: "4px", marginBottom: "16px" }} />
+        <div className="skeleton" style={{ height: "14px", width: "100%", borderRadius: "4px", marginBottom: "8px" }} />
+        <div className="skeleton" style={{ height: "14px", width: "80%", borderRadius: "4px", marginBottom: "8px" }} />
+        <div className="skeleton" style={{ height: "14px", width: "90%", borderRadius: "4px" }} />
+      </div>
     </div>
   );
 }

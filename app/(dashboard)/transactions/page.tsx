@@ -197,9 +197,49 @@ export default function TransactionsPage() {
 
       {/* Table */}
       {!isMounted || isLoading ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {[...Array(8)].map((_, i) => <div key={i} className="skeleton" style={{ height: "64px", borderRadius: "16px" }} />)}
-        </div>
+        <>
+          <div className="premium-card overflow-hidden hidden md:block">
+            <div style={{ overflowX: "auto" }}>
+              <table className="w-full data-table">
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "left", width: "15%" }}>Date</th>
+                    <th style={{ textAlign: "left", width: "20%" }}>Customer Name</th>
+                    <th style={{ textAlign: "left", width: "30%" }}>Description</th>
+                    <th style={{ textAlign: "center", width: "10%" }}>Type</th>
+                    <th style={{ textAlign: "right", width: "12%" }}>Debit (Sale)</th>
+                    <th style={{ textAlign: "right", width: "12%" }}>Credit (Paid)</th>
+                    <th style={{ textAlign: "center", width: "8%" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(8)].map((_, i) => (
+                    <tr key={i}>
+                      <td><div className="skeleton" style={{ height: "16px", width: "80px", borderRadius: "4px" }} /></td>
+                      <td><div className="skeleton" style={{ height: "16px", width: "140px", borderRadius: "4px" }} /></td>
+                      <td>
+                        <div className="skeleton" style={{ height: "16px", width: "180px", borderRadius: "4px", marginBottom: "6px" }} />
+                        <div className="skeleton" style={{ height: "12px", width: "100px", borderRadius: "4px" }} />
+                      </td>
+                      <td style={{ textAlign: "center" }}><div className="skeleton" style={{ height: "24px", width: "60px", borderRadius: "12px", margin: "0 auto" }} /></td>
+                      <td style={{ textAlign: "right" }}><div className="skeleton" style={{ height: "16px", width: "70px", borderRadius: "4px", marginLeft: "auto" }} /></td>
+                      <td style={{ textAlign: "right" }}><div className="skeleton" style={{ height: "16px", width: "70px", borderRadius: "4px", marginLeft: "auto" }} /></td>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                          <div className="skeleton" style={{ height: "28px", width: "28px", borderRadius: "8px" }} />
+                          <div className="skeleton" style={{ height: "28px", width: "28px", borderRadius: "8px" }} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="md:hidden flex flex-col gap-4">
+            {[...Array(8)].map((_, i) => <div key={i} className="skeleton premium-card" style={{ height: "160px" }} />)}
+          </div>
+        </>
       ) : transactions.length === 0 ? (
         <div className="premium-card" style={{ padding: "48px", textAlign: "center" }}>
           <ArrowLeftRight style={{ width: "56px", height: "56px", color: "#C7D2FE", margin: "0 auto 16px" }} />

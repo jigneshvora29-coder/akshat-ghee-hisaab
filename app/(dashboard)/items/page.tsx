@@ -158,8 +158,32 @@ export default function ItemsPage() {
         </div>
         <div style={{ padding: "20px" }}>
           {isLoading ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: "64px", borderRadius: "16px" }} />)}
+            <div style={{ overflowX: "auto" }}>
+              <table className="w-full data-table">
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "left" }}>Item Name</th>
+                    <th style={{ textAlign: "left" }}>Default Qty</th>
+                    <th style={{ textAlign: "right" }}>Default Price</th>
+                    <th style={{ textAlign: "center", width: "120px" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(4)].map((_, i) => (
+                    <tr key={i}>
+                      <td><div className="skeleton" style={{ height: "16px", width: "140px", borderRadius: "4px" }} /></td>
+                      <td><div className="skeleton" style={{ height: "16px", width: "60px", borderRadius: "4px" }} /></td>
+                      <td style={{ textAlign: "right" }}><div className="skeleton" style={{ height: "16px", width: "80px", borderRadius: "4px", marginLeft: "auto" }} /></td>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                          <div className="skeleton" style={{ height: "28px", width: "28px", borderRadius: "8px" }} />
+                          <div className="skeleton" style={{ height: "28px", width: "28px", borderRadius: "8px" }} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : activeItems.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
@@ -247,7 +271,7 @@ export default function ItemsPage() {
           <div className="premium-card" style={{ position: "relative", width: "100%", maxWidth: "500px", padding: "24px", margin: "0 auto", animation: "modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
               <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#0F172A" }}>{editingItem ? "Edit Item" : "Add New Item"}</h2>
-              <button onClick={closeModal} style={{ background: "none", border: "none", color: "#64748B", cursor: "pointer", padding: "4px" }}>
+              <button type="button" onClick={closeModal} disabled={saveMutation.isPending} style={{ background: "none", border: "none", color: "#64748B", cursor: saveMutation.isPending ? "not-allowed" : "pointer", padding: "4px", opacity: saveMutation.isPending ? 0.5 : 1 }}>
                 <X style={{ width: "20px", height: "20px" }} />
               </button>
             </div>
@@ -255,13 +279,13 @@ export default function ItemsPage() {
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>Item Name <span style={{ color: "#DC2626" }}>*</span></label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Pure Cow Ghee" className="form-input w-full" />
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Pure Cow Ghee" className="form-input w-full" disabled={saveMutation.isPending} />
               </div>
               
               <div style={{ display: "flex", gap: "12px" }}>
                 <div style={{ flex: 1 }}>
                   <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>Default Qty <span style={{ color: "#DC2626" }}>*</span></label>
-                  <input type="number" step="any" min="0" value={defaultQuantity} onChange={(e) => setDefaultQuantity(e.target.value)} required className="form-input w-full" />
+                  <input type="number" step="any" min="0" value={defaultQuantity} onChange={(e) => setDefaultQuantity(e.target.value)} required className="form-input w-full" disabled={saveMutation.isPending} />
                 </div>
                 <div style={{ width: "120px" }}>
                   <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>Unit <span style={{ color: "#DC2626" }}>*</span></label>
@@ -269,6 +293,7 @@ export default function ItemsPage() {
                     value={defaultUnit}
                     onChange={setDefaultUnit}
                     className="w-full"
+                    disabled={saveMutation.isPending}
                     options={[
                       { label: "kg", value: "kg" },
                       { label: "gm", value: "gm" },
@@ -282,11 +307,11 @@ export default function ItemsPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>Default Price (₹) <span style={{ color: "#DC2626" }}>*</span></label>
-                <input type="number" step="any" min="0" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)} required placeholder="e.g. 720" className="form-input w-full" />
+                <input type="number" step="any" min="0" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)} required placeholder="e.g. 720" className="form-input w-full" disabled={saveMutation.isPending} />
               </div>
 
               <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                <button type="button" onClick={closeModal} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                <button type="button" onClick={closeModal} disabled={saveMutation.isPending} style={{ flex: 1, padding: "10px", borderRadius: "12px", border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", fontWeight: 600, cursor: saveMutation.isPending ? "not-allowed" : "pointer", opacity: saveMutation.isPending ? 0.6 : 1 }}>Cancel</button>
                 <button type="submit" className="btn-primary" style={{ flex: 1, padding: "10px" }} disabled={saveMutation.isPending}>
                   {saveMutation.isPending ? "Saving..." : "Save Item"}
                 </button>

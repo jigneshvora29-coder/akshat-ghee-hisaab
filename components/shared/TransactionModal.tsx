@@ -161,7 +161,7 @@ export function TransactionModal({ type, customerId, initialData, onClose, onSuc
               <h3 style={{ color: "#FFFFFF", fontWeight: 700, fontSize: "1.25rem" }}>{isEditing ? "Edit" : "Add"} {cfg.label}</h3>
               <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.875rem" }}>{cfg.desc}</p>
             </div>
-            <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.8)", cursor: "pointer", transition: "color 0.15s" }}
+            <button type="button" onClick={onClose} disabled={isSubmitting} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.8)", cursor: isSubmitting ? "not-allowed" : "pointer", transition: "color 0.15s" }}
               onMouseEnter={(e) => { if (!(e.currentTarget as HTMLButtonElement).disabled) e.currentTarget.style.color = "#FFFFFF" }} onMouseLeave={(e) => { if (!(e.currentTarget as HTMLButtonElement).disabled) e.currentTarget.style.color = "rgba(255,255,255,0.8)" }}>
               <X style={{ width: "20px", height: "20px" }} />
             </button>
@@ -179,6 +179,7 @@ export function TransactionModal({ type, customerId, initialData, onClose, onSuc
                     value={watch("customerId")}
                     onChange={(val) => setValue("customerId", val)}
                     className="w-full"
+                    disabled={isSubmitting}
                     options={[
                       { label: "Select a customer...", value: "" },
                       ...availableCustomers.map((c: any) => ({
@@ -207,6 +208,7 @@ export function TransactionModal({ type, customerId, initialData, onClose, onSuc
                     value="add_item_placeholder"
                     onChange={addLineItem}
                     className="w-[180px]"
+                    disabled={isSubmitting}
                     options={[
                       { label: "+ Add Item", value: "add_item_placeholder" },
                       ...availableItems.map((item: any) => ({
@@ -225,18 +227,18 @@ export function TransactionModal({ type, customerId, initialData, onClose, onSuc
                           <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "#0F172A" }}>{item.name}</p>
                         </div>
                         <div style={{ width: "80px" }}>
-                          <input type="number" step="any" min="0" value={item.quantity} onChange={(e) => updateLineItem(index, "quantity", e.target.value)} className="form-input w-full" style={{ padding: "6px" }} />
+                          <input type="number" step="any" min="0" value={item.quantity} onChange={(e) => updateLineItem(index, "quantity", e.target.value)} className="form-input w-full" style={{ padding: "6px" }} disabled={isSubmitting} />
                         </div>
                         <div style={{ width: "40px" }}>
                           <span style={{ fontSize: "0.875rem", color: "#64748B" }}>{item.unit}</span>
                         </div>
                         <div style={{ width: "80px" }}>
-                          <input type="number" step="any" min="0" value={item.rate} onChange={(e) => updateLineItem(index, "rate", e.target.value)} className="form-input w-full" style={{ padding: "6px" }} />
+                          <input type="number" step="any" min="0" value={item.rate} onChange={(e) => updateLineItem(index, "rate", e.target.value)} className="form-input w-full" style={{ padding: "6px" }} disabled={isSubmitting} />
                         </div>
                         <div style={{ width: "80px", textAlign: "right" }}>
                           <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#059669" }}>{formatCurrency(item.total)}</span>
                         </div>
-                        <button type="button" onClick={() => removeLineItem(index)} style={{ padding: "4px", color: "#94A3B8", background: "none", border: "none", cursor: "pointer" }}>
+                        <button type="button" onClick={() => removeLineItem(index)} disabled={isSubmitting} style={{ padding: "4px", color: "#94A3B8", background: "none", border: "none", cursor: isSubmitting ? "not-allowed" : "pointer", opacity: isSubmitting ? 0.5 : 1 }}>
                           <X style={{ width: "16px", height: "16px" }} />
                         </button>
                       </div>

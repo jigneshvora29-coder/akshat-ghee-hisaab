@@ -168,7 +168,7 @@ function CustomersContent() {
             ]}
           />
         </div>
-        <div style={{ display: "none", gap: "8px", marginTop: "16px", flexWrap: "wrap" }} className="md:flex">
+        <div style={{ gap: "8px", marginTop: "16px", flexWrap: "wrap" }} className="hidden md:flex">
           {filterOptions.map((f) => (
             <button
               key={f.value}
@@ -454,9 +454,56 @@ function EmptyCustomers({ search, filter }: { search: string; filter: CustomerFi
 
 function CustomersSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: "96px", borderRadius: "16px" }} />)}
-    </div>
+    <>
+      <div className="premium-card overflow-hidden hidden md:block">
+        <div style={{ overflowX: "auto" }}>
+          <table className="w-full data-table">
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left" }}>Customer Details</th>
+                <th style={{ textAlign: "left" }}>Contact</th>
+                <th style={{ textAlign: "right" }}>Ledger Balance</th>
+                <th style={{ textAlign: "left" }}>Created On</th>
+                <th style={{ textAlign: "center", width: "140px" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(6)].map((_, i) => (
+                <tr key={i}>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                      <div className="skeleton" style={{ width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <div className="skeleton" style={{ height: "16px", width: "120px", borderRadius: "4px", marginBottom: "6px" }} />
+                        <div className="skeleton" style={{ height: "12px", width: "80px", borderRadius: "4px" }} />
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="skeleton" style={{ height: "16px", width: "100px", borderRadius: "4px" }} />
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <div className="skeleton" style={{ height: "18px", width: "80px", borderRadius: "4px", marginLeft: "auto" }} />
+                  </td>
+                  <td>
+                    <div className="skeleton" style={{ height: "16px", width: "90px", borderRadius: "4px" }} />
+                  </td>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                      <div className="skeleton" style={{ height: "28px", width: "28px", borderRadius: "8px" }} />
+                      <div className="skeleton" style={{ height: "28px", width: "28px", borderRadius: "8px" }} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="md:hidden flex flex-col gap-4">
+        {[...Array(6)].map((_, i) => <div key={i} className="skeleton premium-card" style={{ height: "140px" }} />)}
+      </div>
+    </>
   );
 }
 
