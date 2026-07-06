@@ -196,12 +196,10 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {activeTab !== "security" && (
-            <button type="submit" disabled={isSaving} className="btn-primary" style={{ width: "fit-content" }}>
-              {isSaving ? <Loader2 style={{ width: "16px", height: "16px", animation: "spin 0.7s linear infinite" }} /> : <Save style={{ width: "16px", height: "16px" }} />}
-              {isSaving ? "Saving..." : "Save Settings"}
-            </button>
-          )}
+          <button type="submit" disabled={isSaving} className="btn-primary" style={{ width: "fit-content" }}>
+            {isSaving ? <Loader2 style={{ width: "16px", height: "16px", animation: "spin 0.7s linear infinite" }} /> : <Save style={{ width: "16px", height: "16px" }} />}
+            {isSaving ? "Saving..." : "Save Settings"}
+          </button>
         </form>
       )}
     </div>

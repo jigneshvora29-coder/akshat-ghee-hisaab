@@ -58,8 +58,8 @@ export default function TransactionsPage() {
       if (!res.ok) throw new Error("Failed");
     },
     onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.removeQueries({ queryKey: ["transactions"] });
+      queryClient.removeQueries({ queryKey: ["dashboard"] });
       queryClient.removeQueries({ queryKey: ["customers"] });
       queryClient.removeQueries({ queryKey: ["customer"] });
       if (vars.restore) toast.success("Transaction restored");
@@ -73,8 +73,8 @@ export default function TransactionsPage() {
   const pagination = data?.pagination;
 
   const filterColors: Record<FilterType, { bg: string; color: string; border: string }> = {
-    all: { bg: "#4F46E5", color: "#FFFFFF", border: "#4F46E5" },
-    SALE: { bg: "#DC2626", color: "#FFFFFF", border: "#DC2626" },
+    all: { bg: "#475569", color: "#FFFFFF", border: "#475569" },
+    SALE: { bg: "#4F46E5", color: "#FFFFFF", border: "#4F46E5" },
     PAYMENT: { bg: "#059669", color: "#FFFFFF", border: "#059669" },
     ADJUSTMENT: { bg: "#D97706", color: "#FFFFFF", border: "#D97706" },
   };
@@ -82,9 +82,22 @@ export default function TransactionsPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {/* Header */}
-      <div>
-        <h1 className="font-display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>Transactions</h1>
-        <p style={{ color: "#64748B", fontSize: "0.875rem", marginTop: "2px" }}>{pagination?.total ?? "..."} total transaction entries</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+        <div>
+          <h1 className="font-display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>Transactions</h1>
+          <p style={{ color: "#64748B", fontSize: "0.875rem", marginTop: "2px" }}>{pagination?.total ?? "..."} total transaction entries</p>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px", background: "#F1F5F9", padding: "12px", borderRadius: "12px" }}>
+          <button onClick={() => setTxnModal({ type: "sale", customerId: "" })} className="btn-primary" style={{ padding: "8px 14px", background: "#4F46E5" }}>
+            <TrendingUp style={{ width: "16px", height: "16px" }} /> Add Sale
+          </button>
+          <button onClick={() => setTxnModal({ type: "payment", customerId: "" })} className="btn-primary" style={{ padding: "8px 14px", background: "#059669" }}>
+            <IndianRupee style={{ width: "16px", height: "16px" }} /> Add Payment
+          </button>
+          <button onClick={() => setTxnModal({ type: "adjustment", customerId: "" })} className="btn-primary" style={{ padding: "8px 14px", background: "#D97706" }}>
+            <ArrowLeftRight style={{ width: "16px", height: "16px" }} /> Adjustment
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -244,7 +257,7 @@ export default function TransactionsPage() {
                           {txn.type}
                         </span>
                       </td>
-                      <td style={{ textAlign: "right", fontFamily: "monospace", fontWeight: 700, fontSize: "0.875rem", color: "#DC2626" }}>
+                      <td style={{ textAlign: "right", fontFamily: "monospace", fontWeight: 700, fontSize: "0.875rem", color: "#4F46E5" }}>
                         {txn.type === "SALE" ? formatCurrency(txn.amount) : "—"}
                       </td>
                       <td style={{ textAlign: "right", fontFamily: "monospace", fontWeight: 700, fontSize: "0.875rem", color: "#059669" }}>
@@ -287,9 +300,9 @@ export default function TransactionsPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{
                     width: "40px", height: "40px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    background: txn.type === "SALE" ? "#FEF2F2" : txn.type === "PAYMENT" ? "#ECFDF5" : "#FFFBEB",
-                    color: txn.type === "SALE" ? "#DC2626" : txn.type === "PAYMENT" ? "#059669" : "#D97706",
-                    border: `1px solid ${txn.type === "SALE" ? "#FECACA" : txn.type === "PAYMENT" ? "#A7F3D0" : "#FDE68A"}`
+                    background: txn.type === "SALE" ? "#EEF2FF" : txn.type === "PAYMENT" ? "#ECFDF5" : "#FFFBEB",
+                    color: txn.type === "SALE" ? "#4F46E5" : txn.type === "PAYMENT" ? "#059669" : "#D97706",
+                    border: `1px solid ${txn.type === "SALE" ? "#E0E7FF" : txn.type === "PAYMENT" ? "#A7F3D0" : "#FDE68A"}`
                   }}>
                     {txn.type === "SALE" ? <TrendingUp style={{ width: "16px", height: "16px" }} /> : <IndianRupee style={{ width: "16px", height: "16px" }} />}
                   </div>
@@ -381,7 +394,7 @@ export default function TransactionsPage() {
         <TransactionModal
           type={txnModal.type} customerId={txnModal.customerId} initialData={txnModal.data} onClose={() => setTxnModal(null)}
           onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["transactions"] }); queryClient.removeQueries({ queryKey: ["customers"] }); queryClient.removeQueries({ queryKey: ["customer"] }); queryClient.removeQueries({ queryKey: ["dashboard"] }); setTxnModal(null);
+            queryClient.removeQueries({ queryKey: ["transactions"] }); queryClient.removeQueries({ queryKey: ["customers"] }); queryClient.removeQueries({ queryKey: ["customer"] }); queryClient.removeQueries({ queryKey: ["dashboard"] }); setTxnModal(null);
           }}
         />
       )}

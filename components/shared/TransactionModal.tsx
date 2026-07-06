@@ -65,7 +65,7 @@ export function TransactionModal({ type, customerId, initialData, onClose, onSuc
   const [lineItems, setLineItems] = useState<any[]>(() => {
     if (initialData && initialData.items && initialData.items.length > 0) {
       return initialData.items.map((i: any) => ({
-        itemId: i.itemId,
+        itemId: i.itemId || i.item?.id,
         name: i.item?.name || "Unknown Item",
         quantity: Number(i.quantity),
         unit: i.unit,

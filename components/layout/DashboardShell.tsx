@@ -67,6 +67,7 @@ export function DashboardShell({ children, defaultCollapsed = false }: { childre
       {/* Desktop TopNav */}
       <TopNav
         sidebarCollapsed={sidebarCollapsed}
+        onMenuClick={() => {}}
         onSearchOpen={() => setSearchOpen(true)}
       />
 

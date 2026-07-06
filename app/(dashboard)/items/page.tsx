@@ -137,7 +137,7 @@ export default function ItemsPage() {
           <h1 className="font-display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>Inventory Items</h1>
           <p style={{ color: "#64748B", fontSize: "0.875rem", marginTop: "2px" }}>Manage your products and default prices.</p>
         </div>
-        <button onClick={() => openModal()} className="btn-primary">
+        <button onClick={() => openModal()} className="btn-primary" style={{ background: "#0D9488", padding: "10px 16px" }}>
           <Plus style={{ width: "16px", height: "16px" }} />
           <span>Add Item</span>
         </button>
@@ -158,7 +158,9 @@ export default function ItemsPage() {
         </div>
         <div style={{ padding: "20px" }}>
           {isLoading ? (
-            <p style={{ color: "#64748B", fontSize: "0.875rem" }}>Loading items...</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: "64px", borderRadius: "16px" }} />)}
+            </div>
           ) : activeItems.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               <Package style={{ width: "48px", height: "48px", color: "#CBD5E1", margin: "0 auto 12px" }} />

@@ -54,9 +54,7 @@ export const createTransactionSchema = z.object({
   items: z.array(transactionItemSchema).optional(),
 });
 
-export const updateTransactionSchema = createTransactionSchema.partial().extend({
-  id: z.string().min(1),
-});
+export const updateTransactionSchema = createTransactionSchema.partial();
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;

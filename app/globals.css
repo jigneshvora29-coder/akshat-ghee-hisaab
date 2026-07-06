@@ -230,9 +230,9 @@ body {
 
 /* ─── Badge variants ─────────────────────────────────────────────────────── */
 .badge-pending {
-  background: #FEF2F2;
-  color: #DC2626;
-  border: 1px solid #FECACA;
+  background: #F3E8FF;
+  color: #9333EA;
+  border: 1px solid #E9D5FF;
 }
 
 .badge-paid {
@@ -242,9 +242,9 @@ body {
 }
 
 .badge-sale {
-  background: #FEF2F2;
-  color: #DC2626;
-  border: 1px solid #FECACA;
+  background: #EEF2FF;
+  color: #4F46E5;
+  border: 1px solid #E0E7FF;
   padding: 3px 8px;
 }
 

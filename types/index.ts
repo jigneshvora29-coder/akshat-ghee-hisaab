@@ -40,10 +40,23 @@ export type Transaction = {
   runningBalance: number;
   createdById: string | null;
   isDeleted: boolean;
+  isArchived: boolean;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  items?: TransactionItem[];
   customer?: Pick<Customer, "id" | "name" | "phone">;
+};
+
+export type TransactionItem = {
+  id: string;
+  transactionId: string;
+  itemId: string;
+  quantity: number;
+  unit: string;
+  rate: number;
+  total: number;
+  item?: { id: string; name: string };
 };
 
 // ─── Business Settings Types ──────────────────────────────────────────────────

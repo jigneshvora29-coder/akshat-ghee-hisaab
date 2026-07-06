@@ -67,7 +67,7 @@ function CustomersContent() {
       const res = await fetch(`/api/customers/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPinned }) });
       if (!res.ok) throw new Error("Failed"); return res.json();
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["customers"] }); queryClient.removeQueries({ queryKey: ["dashboard"] }); },
+    onSuccess: () => { queryClient.removeQueries({ queryKey: ["customers"] }); queryClient.removeQueries({ queryKey: ["dashboard"] }); },
   });
 
   const toggleFavoriteMutation = useMutation({
@@ -75,7 +75,7 @@ function CustomersContent() {
       const res = await fetch(`/api/customers/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isFavorite }) });
       if (!res.ok) throw new Error("Failed"); return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["customers"] }),
+    onSuccess: () => queryClient.removeQueries({ queryKey: ["customers"] }),
   });
 
   const deleteMutation = useMutation({
@@ -87,7 +87,7 @@ function CustomersContent() {
       if (!res.ok) throw new Error("Failed"); return res.json();
     },
     onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.removeQueries({ queryKey: ["customers"] });
       queryClient.removeQueries({ queryKey: ["dashboard"] });
       queryClient.removeQueries({ queryKey: ["transactions"] });
       if (vars.restore) toast.success("Customer restored");
@@ -110,7 +110,7 @@ function CustomersContent() {
             {pagination?.total ?? "..."} total customer accounts
           </p>
         </div>
-        <Link href="/customers/new" className="btn-primary">
+        <Link href="/customers/new" className="btn-primary" style={{ background: "#0284C7", padding: "10px 16px" }}>
           <UserPlus style={{ width: "16px", height: "16px" }} />
           <span className="hidden sm:inline">Add Customer</span>
         </Link>
@@ -345,7 +345,7 @@ function CustomerRow({ customer, filter, onTogglePin, onToggleFavorite, onDelete
         ) : <span style={{ color: "#CBD5E1", fontSize: "0.75rem" }}>—</span>}
       </td>
       <td style={{ textAlign: "right" }}>
-        <span style={{ fontWeight: 800, fontSize: "0.875rem", color: Number(customer.currentBalance) > 0 ? "#DC2626" : "#059669" }}>
+        <span style={{ fontWeight: 800, fontSize: "0.875rem", color: Number(customer.currentBalance) > 0 ? "#9333EA" : "#059669" }}>
           {formatCurrency(customer.currentBalance)}
         </span>
       </td>
@@ -399,7 +399,7 @@ function CustomerCard({ customer, filter, onTogglePin, onToggleFavorite, onDelet
                 {customer.isFavorite && <Star style={{ width: "12px", height: "12px", color: "#D97706", fill: "#D97706" }} />}
               </div>
             </div>
-            <span style={{ fontWeight: 800, fontSize: "1rem", color: Number(customer.currentBalance) > 0 ? "#DC2626" : "#059669" }}>
+            <span style={{ fontWeight: 800, fontSize: "1rem", color: Number(customer.currentBalance) > 0 ? "#9333EA" : "#059669" }}>
               {formatCurrency(customer.currentBalance)}
             </span>
           </div>

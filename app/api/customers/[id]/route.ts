@@ -22,6 +22,19 @@ export async function GET(
       transactions: {
         where: { isDeleted: false, isArchived: false },
         orderBy: { date: "asc" },
+        include: {
+          items: {
+            select: {
+              id: true,
+              itemId: true,
+              quantity: true,
+              rate: true,
+              total: true,
+              unit: true,
+              item: { select: { id: true, name: true, defaultUnit: true } },
+            },
+          },
+        },
       },
       _count: {
         select: { transactions: { where: { isDeleted: false } } },

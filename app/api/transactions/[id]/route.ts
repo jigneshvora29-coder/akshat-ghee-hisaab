@@ -91,16 +91,19 @@ export async function PATCH(
       if (!customer) throw new Error("Customer not found");
 
       let balance = Number(customer.openingBalance);
+      const updates = [];
       for (const txn of allTxns) {
         if (txn.type === "SALE") balance += Number(txn.amount);
         else if (txn.type === "PAYMENT") balance -= Number(txn.amount);
         else balance += Number(txn.amount);
 
-        await tx.transaction.update({
+        updates.push(tx.transaction.update({
           where: { id: txn.id },
           data: { runningBalance: balance },
-        });
+        }));
       }
+
+      await Promise.all(updates);
 
       await tx.customer.update({
         where: { id: existing.customerId },
@@ -127,6 +130,7 @@ export async function PATCH(
     return NextResponse.json({ data: result });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("Zod Validation Error in PATCH /api/transactions/[id]:", JSON.stringify(error.issues, null, 2));
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
     }
     console.error("Update transaction error:", error);
@@ -181,17 +185,24 @@ export async function DELETE(
     if (!customer) return;
 
     let balance = Number(customer.openingBalance);
+    const updates = [];
     for (const txn of activeTxns) {
       if (txn.type === "SALE") balance += Number(txn.amount);
       else if (txn.type === "PAYMENT") balance -= Number(txn.amount);
       else balance += Number(txn.amount);
-      await tx.transaction.update({ where: { id: txn.id }, data: { runningBalance: balance } });
+      updates.push(tx.transaction.update({ where: { id: txn.id }, data: { runningBalance: balance } }));
     }
+
+    // Run all runningBalance updates concurrently to avoid transaction timeout
+    await Promise.all(updates);
 
     await tx.customer.update({
       where: { id: existing.customerId },
       data: { currentBalance: balance },
     });
+  }, {
+    maxWait: 10000,
+    timeout: 20000,
   });
 
   await prisma.auditLog.create({

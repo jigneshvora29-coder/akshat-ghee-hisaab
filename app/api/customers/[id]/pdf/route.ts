@@ -25,6 +25,7 @@ export async function GET(
         transactions: {
           where: { isDeleted: false },
           orderBy: { date: "asc" },
+          include: { items: { include: { item: true } } }
         },
       },
     });
@@ -44,11 +45,22 @@ export async function GET(
 
     // Filter transactions by date range if specified
     let filteredTransactions = customer.transactions;
+    let calculatedOpeningBalance = Number(customer.openingBalance || 0);
+
     if (dateRange) {
       const fromDate = new Date(dateRange.from);
       const toDate = new Date(dateRange.to);
       toDate.setHours(23, 59, 59, 999); // Include entire end date
 
+      // Calculate the sum of all transactions before the start date
+      const pastTransactions = customer.transactions.filter(t => new Date(t.date) < fromDate);
+      const pastSales = pastTransactions.filter(t => t.type === "SALE").reduce((sum, t) => sum + Number(t.amount), 0);
+      const pastCredits = pastTransactions.filter(t => t.type !== "SALE").reduce((sum, t) => sum + Number(t.amount), 0);
+      
+      // The opening balance for this date range statement
+      calculatedOpeningBalance = calculatedOpeningBalance + pastSales - pastCredits;
+
+      // Filter transactions to only those within the date range
       filteredTransactions = customer.transactions.filter((t) => {
         const d = new Date(t.date);
         return d >= fromDate && d <= toDate;
@@ -61,7 +73,8 @@ export async function GET(
       transactions: filteredTransactions as any,
       business: settings as any,
       dateRange,
-    });
+      calculatedOpeningBalance
+    }) as React.ReactElement<any>;
 
     const pdfBuffer = await renderToBuffer(docElement);
 
@@ -74,7 +87,7 @@ export async function GET(
       `inline; filename="ledger_${sanitizedCustomerName}.pdf"`
     );
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as any, {
       status: 200,
       headers,
     });

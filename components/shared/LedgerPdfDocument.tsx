@@ -21,6 +21,7 @@ interface LedgerPdfDocumentProps {
   transactions: Transaction[];
   business?: BusinessSettings | null;
   dateRange?: { from: string; to: string } | null;
+  calculatedOpeningBalance?: number;
 }
 
 // ─── StyleSheet ───────────────────────────────────────────────────────────────
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     borderBottomWidth: 2,
-    borderBottomColor: "#2B6CB0", // Muted Blue Primary
+    borderBottomColor: "#4F46E5", // Indigo Primary
     paddingBottom: 16,
     marginBottom: 20,
   },
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: "#2B6CB0", // Muted Blue
+    backgroundColor: "#4F46E5", // Indigo
     justifyContent: "center",
     alignItems: "center",
   },
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
   businessName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#2B6CB0", // Muted Blue
+    color: "#4F46E5", // Indigo
   },
   businessSub: {
     fontSize: 10,
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#2B6CB0", // Muted Blue
+    backgroundColor: "#4F46E5", // Indigo
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     paddingVertical: 8,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   amountDebit: {
-    color: "#2B6CB0", // Muted Blue for Debit Sales
+    color: "#4F46E5", // Indigo for Debit Sales
     fontWeight: "bold",
   },
   amountCredit: {
@@ -238,9 +239,9 @@ const styles = StyleSheet.create({
   // Totals Row
   totalsRow: {
     flexDirection: "row",
-    backgroundColor: "#EBF8FF", // Very light blue
+    backgroundColor: "#EEF2FF", // Light Indigo
     borderBottomWidth: 2,
-    borderBottomColor: "#2B6CB0",
+    borderBottomColor: "#4F46E5",
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
@@ -312,8 +313,8 @@ const styles = StyleSheet.create({
 });
 
 // ─── PDF Component ────────────────────────────────────────────────────────────
-export function LedgerPdfDocument({ customer, transactions, business, dateRange }: LedgerPdfDocumentProps) {
-  const openingBalance = Number(customer.openingBalance);
+export function LedgerPdfDocument({ customer, transactions, business, dateRange, calculatedOpeningBalance }: LedgerPdfDocumentProps) {
+  const openingBalance = calculatedOpeningBalance ?? Number(customer.openingBalance);
   
   // Ensure chronologically sorted transactions for correct running balance recalculation
   const sortedTxns = [...transactions].sort(
@@ -328,7 +329,8 @@ export function LedgerPdfDocument({ customer, transactions, business, dateRange 
     .filter((t) => t.type === "PAYMENT")
     .reduce((s, t) => s + Number(t.amount), 0);
   
-  const currentOutstanding = Number(customer.currentBalance);
+  // Calculate current outstanding based on the statement's opening balance and activity
+  const currentOutstanding = openingBalance + totalDebit - totalCredit;
   const isFullyPaid = currentOutstanding <= 0;
 
   return (
@@ -409,9 +411,9 @@ export function LedgerPdfDocument({ customer, transactions, business, dateRange 
 
         {/* 3. KPI SUMMARY CARDS */}
         <View style={styles.summaryGrid}>
-          <View style={[styles.summaryCard, { borderLeftWidth: 3, borderLeftColor: "#2B6CB0" }]}>
+          <View style={[styles.summaryCard, { borderLeftWidth: 3, borderLeftColor: "#4F46E5" }]}>
             <Text style={styles.summaryLabel}>Total Sales</Text>
-            <Text style={[styles.summaryValue, { color: "#2B6CB0" }]}>{formatCurrency(totalDebit)}</Text>
+            <Text style={[styles.summaryValue, { color: "#4F46E5" }]}>{formatCurrency(totalDebit)}</Text>
             <Text style={styles.summaryBadgeText}>Debit amount</Text>
           </View>
 
@@ -426,13 +428,13 @@ export function LedgerPdfDocument({ customer, transactions, business, dateRange 
               styles.summaryCard,
               {
                 borderLeftWidth: 3,
-                borderLeftColor: isFullyPaid ? "#059669" : "#D97706",
-                backgroundColor: isFullyPaid ? "#ECFDF5" : "#FFFBEB",
+                borderLeftColor: isFullyPaid ? "#059669" : "#9333EA",
+                backgroundColor: isFullyPaid ? "#ECFDF5" : "#FAF5FF",
               },
             ]}
           >
             <Text style={styles.summaryLabel}>{isFullyPaid ? "Credit Balance" : "Outstanding"}</Text>
-            <Text style={[styles.summaryValue, { color: isFullyPaid ? "#059669" : "#B45309" }]}>
+            <Text style={[styles.summaryValue, { color: isFullyPaid ? "#059669" : "#7E22CE" }]}>
               {formatCurrency(Math.abs(currentOutstanding))}
             </Text>
             <Text style={styles.summaryBadgeText}>{isFullyPaid ? "Settled Account" : "Pending collection"}</Text>
@@ -444,13 +446,13 @@ export function LedgerPdfDocument({ customer, transactions, business, dateRange 
           style={[
             styles.statusBanner,
             {
-              backgroundColor: isFullyPaid ? "#ECFDF5" : "#FEF3C7",
+              backgroundColor: isFullyPaid ? "#ECFDF5" : "#FAF5FF",
               borderWidth: 1,
-              borderColor: isFullyPaid ? "#A7F3D0" : "#FDE68A",
+              borderColor: isFullyPaid ? "#A7F3D0" : "#E9D5FF",
             },
           ]}
         >
-          <Text style={[styles.statusText, { color: isFullyPaid ? "#059669" : "#B45309" }]}>
+          <Text style={[styles.statusText, { color: isFullyPaid ? "#059669" : "#7E22CE" }]}>
             {isFullyPaid ? "★ FULLY PAID — Account has zero outstanding balance." : "⚠ PENDING PAYMENT — Account balance requires settlement."}
           </Text>
         </View>
@@ -483,9 +485,22 @@ export function LedgerPdfDocument({ customer, transactions, business, dateRange 
             return (
               <View key={txn.id} style={[styles.tableRow, isRowOdd ? styles.tableRowEven : styles.tableRowOdd]}>
                 <Text style={[styles.td, styles.colDate, styles.textLeft]}>{formatDate(txn.date)}</Text>
-                <Text style={[styles.td, styles.colDesc, styles.textLeft]}>
-                  {txn.description} {txn.referenceNumber ? `[Ref: ${txn.referenceNumber}]` : ""}
-                </Text>
+                <View style={[styles.td, styles.colDesc, styles.textLeft, { display: "flex", flexDirection: "column", gap: 2 }]}>
+                  {txn.items && txn.items.length > 0 ? (
+                    <>
+                      <Text style={{ fontWeight: "bold" }}>Sale {txn.referenceNumber ? `[Ref: ${txn.referenceNumber}]` : ""}</Text>
+                      {txn.items.map(item => (
+                        <Text key={item.id} style={{ fontSize: 7, color: "#475569" }}>
+                          • {item.item?.name || "Item"} — {Number(item.quantity)} {item.unit} @ {formatCurrency(Number(item.rate))} = {formatCurrency(Number(item.total))}
+                        </Text>
+                      ))}
+                    </>
+                  ) : (
+                    <Text>
+                      {txn.description} {txn.referenceNumber ? `[Ref: ${txn.referenceNumber}]` : ""}
+                    </Text>
+                  )}
+                </View>
                 <Text style={[styles.td, styles.colDebit, styles.textRight, styles.amountDebit]}>
                   {txn.type === "SALE" ? formatCurrency(txn.amount) : "—"}
                 </Text>

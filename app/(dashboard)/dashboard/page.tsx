@@ -38,7 +38,7 @@ const itemVariants: Variants = {
 export default function DashboardPage() {
   const queryClient = useQueryClient();
   const [txnModal, setTxnModal] = useState<{ type: "sale" | "payment" | "adjustment" } | null>(null);
-  
+
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
 
@@ -70,11 +70,11 @@ export default function DashboardPage() {
           </p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button onClick={() => setTxnModal({ type: "sale" })} className="btn-secondary">
+          <button onClick={() => setTxnModal({ type: "sale" })} className="btn-primary" style={{ padding: "10px 16px", background: "#4F46E5" }}>
             <Plus style={{ width: "16px", height: "16px" }} />
             <span className="hidden sm:inline">Add Sale</span>
           </button>
-          <Link href="/customers/new" className="btn-primary">
+          <Link href="/customers/new" className="btn-primary" style={{ background: "#0284C7", padding: "10px 16px" }}>
             <UserPlus style={{ width: "16px", height: "16px" }} />
             <span className="hidden sm:inline">Add Customer</span>
           </Link>
@@ -82,12 +82,10 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Stats cards */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard title="Today's Sales" value={formatCurrency(stats.todaySales)} icon={TrendingUp} accent="#4F46E5" />
         <StatCard title="Today's Collections" value={formatCurrency(stats.todayPayments)} icon={TrendingDown} accent="#059669" />
-        <StatCard title="Outstanding" value={formatCurrency(stats.outstandingAmount)} icon={AlertCircle} accent="#DC2626" className="col-span-2 lg:col-span-1" />
-        <StatCard title="Customers" value={stats.totalCustomers.toLocaleString("en-IN")} icon={Users} accent="#2563EB" />
-        <StatCard title="Transactions" value={stats.totalTransactions.toLocaleString("en-IN")} icon={ArrowLeftRight} accent="#D97706" />
+        <StatCard title="Outstanding" value={formatCurrency(stats.outstandingAmount)} icon={AlertCircle} accent="#9333EA" />
       </motion.div>
 
 
@@ -119,8 +117,8 @@ export default function DashboardPage() {
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
-                      background: txn.type === "SALE" ? "#FEF2F2" : txn.type === "PAYMENT" ? "#ECFDF5" : "#FFFBEB",
-                      color: txn.type === "SALE" ? "#DC2626" : txn.type === "PAYMENT" ? "#059669" : "#D97706",
+                      background: txn.type === "SALE" ? "#EEF2FF" : txn.type === "PAYMENT" ? "#ECFDF5" : "#FFFBEB",
+                      color: txn.type === "SALE" ? "#4F46E5" : txn.type === "PAYMENT" ? "#059669" : "#D97706",
                     }}
                   >
                     {txn.type === "SALE" ? (
@@ -140,7 +138,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <p style={{ fontSize: "0.875rem", fontWeight: 700, color: txn.type === "SALE" ? "#DC2626" : "#059669" }}>
+                    <p style={{ fontSize: "0.875rem", fontWeight: 700, color: txn.type === "SALE" ? "#4F46E5" : "#059669" }}>
                       {txn.type === "PAYMENT" ? "-" : "+"}{formatCurrency(txn.amount)}
                     </p>
                     <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{formatDate(txn.date)}</p>
@@ -193,7 +191,7 @@ export default function DashboardPage() {
                     </p>
                     <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{customer.village || "—"}</p>
                   </div>
-                  <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#DC2626", flexShrink: 0 }}>
+                  <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#9333EA", flexShrink: 0 }}>
                     {formatCurrency(customer.currentBalance)}
                   </p>
                 </Link>
@@ -208,7 +206,9 @@ export default function DashboardPage() {
           type={txnModal.type}
           onClose={() => setTxnModal(null)}
           onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+            queryClient.removeQueries({ queryKey: ["dashboard"] });
+            queryClient.removeQueries({ queryKey: ["transactions"] });
+            queryClient.removeQueries({ queryKey: ["customers"] });
             setTxnModal(null);
           }}
         />

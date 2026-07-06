@@ -22,6 +22,7 @@ import { LedgerView } from "@/features/ledger/LedgerView";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { CustomSelect } from "@/components/shared/CustomSelect";
 import { TransactionModal } from "@/components/shared/TransactionModal";
+import { PrintModal } from "@/components/shared/PrintModal";
 
 async function fetchCustomer(id: string): Promise<CustomerWithTransactions> {
   const res = await fetch(`/api/customers/${id}`);
@@ -41,7 +42,7 @@ export default function CustomerProfilePage() {
   const params = useParams();
   const id = params.id as string;
   const router = useRouter();
-  
+
   const handleBack = () => {
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
@@ -56,6 +57,7 @@ export default function CustomerProfilePage() {
   const queryClient = useQueryClient();
   const [txnModal, setTxnModal] = useState<{ type: "sale" | "payment" | "adjustment", data?: Transaction } | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
   const [txnFilter, setTxnFilter] = useState<"last_10" | "this_month" | "last_3_months" | "last_6_months" | "last_year" | "all">("last_10");
 
   const { data: customer, isLoading } = useQuery({
@@ -169,29 +171,29 @@ export default function CustomerProfilePage() {
           {/* Balance cards */}
           <div className="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
             <MiniStatCard label="Opening" value={formatCurrency(customer.openingBalance)} color="#2563EB" />
-            <MiniStatCard label="Total Sales" value={formatCurrency(totalSales)} color="#DC2626" />
+            <MiniStatCard label="Total Sales" value={formatCurrency(totalSales)} color="#4F46E5" />
             <MiniStatCard label="Total Paid" value={formatCurrency(totalPayments)} color="#059669" />
-            <MiniStatCard label={Number(customer.currentBalance) >= 0 ? "Outstanding" : "Credit"} value={formatCurrency(Math.abs(Number(customer.currentBalance)))} color={Number(customer.currentBalance) > 0 ? "#DC2626" : "#059669"} large />
+            <MiniStatCard label={Number(customer.currentBalance) >= 0 ? "Outstanding" : "Credit"} value={formatCurrency(Math.abs(Number(customer.currentBalance)))} color={Number(customer.currentBalance) > 0 ? "#9333EA" : "#059669"} large />
           </div>
         </div>
 
         {/* Action buttons */}
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px", background: "#F1F5F9", padding: "16px", borderRadius: "16px" }} className="no-print">
-          <button onClick={() => setTxnModal({ type: "sale" })} className="btn-danger" style={{ padding: "10px 16px" }}>
+          <button onClick={() => setTxnModal({ type: "sale" })} className="btn-primary" style={{ padding: "10px 16px", background: "#4F46E5" }}>
             <TrendingUp style={{ width: "16px", height: "16px" }} /> Add Sale
           </button>
           <button onClick={() => setTxnModal({ type: "payment" })} className="btn-primary" style={{ padding: "10px 16px", background: "#059669" }}>
             <IndianRupee style={{ width: "16px", height: "16px" }} /> Add Payment
           </button>
-          <button onClick={() => setTxnModal({ type: "adjustment" })} className="btn-secondary" style={{ padding: "10px 16px" }}>
+          <button onClick={() => setTxnModal({ type: "adjustment" })} className="btn-primary" style={{ padding: "10px 16px", background: "#D97706" }}>
             <ArrowLeftRight style={{ width: "16px", height: "16px" }} /> Adjustment
           </button>
 
           <div style={{ width: "1px", height: "24px", background: "#CBD5E1", margin: "0 4px" }} className="hidden sm:block" />
 
-          <a href={`/api/customers/${id}/pdf`} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: "10px 16px", textDecoration: "none" }}>
-            <Printer style={{ width: "16px", height: "16px", color: "#4F46E5" }} /> Print
-          </a>
+          <button onClick={() => setShowPrintModal(true)} className="btn-primary" style={{ padding: "10px 16px", background: "#0D9488" }}>
+            <Printer style={{ width: "16px", height: "16px" }} /> Print
+          </button>
         </div>
 
         {/* Transaction History */}
@@ -234,6 +236,12 @@ export default function CustomerProfilePage() {
             }}
           />
         )}
+
+        <AnimatePresence>
+          {showPrintModal && (
+            <PrintModal customerId={id} onClose={() => setShowPrintModal(false)} />
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {showConfirmDelete && (
@@ -304,8 +312,17 @@ function TransactionTable({ transactions, customerId, onUpdate, onEdit }: { tran
               <tr key={txn.id} className={cn(txn.isDeleted && "opacity-50 line-through")}>
                 <td style={{ fontSize: "0.875rem", color: "#64748B", whiteSpace: "nowrap" }}>{formatDate(txn.date)}</td>
                 <td>
-                  <p style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 500 }}>{txn.description}</p>
-                  {txn.referenceNumber && <p style={{ fontSize: "0.6875rem", color: "#94A3B8", marginTop: "2px" }}>#{txn.referenceNumber}</p>}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                    <p style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 500 }}>
+                      {txn.items && txn.items.length > 0 ? "Sale" : txn.description}
+                    </p>
+                    {txn.items && txn.items.length > 0 && txn.items.map(item => (
+                      <p key={item.id} style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                        • {item.item?.name || "Item"} — {Number(item.quantity)} {item.unit} @ {formatCurrency(Number(item.rate))} = {formatCurrency(Number(item.total))}
+                      </p>
+                    ))}
+                    {txn.referenceNumber && <p style={{ fontSize: "0.6875rem", color: "#94A3B8", marginTop: "2px" }}>#{txn.referenceNumber}</p>}
+                  </div>
                 </td>
                 <td style={{ textAlign: "right" }}>
                   {txn.type === "SALE" ? <span style={{ color: "#4F46E5", fontWeight: 600, fontSize: "0.875rem" }}>{formatCurrency(txn.amount)}</span> : <span style={{ color: "#94A3B8", fontSize: "0.875rem" }}>—</span>}
@@ -314,7 +331,7 @@ function TransactionTable({ transactions, customerId, onUpdate, onEdit }: { tran
                   {txn.type === "PAYMENT" ? <span style={{ color: "#059669", fontWeight: 600, fontSize: "0.875rem" }}>{formatCurrency(txn.amount)}</span> : txn.type === "ADJUSTMENT" ? <span style={{ color: "#D97706", fontWeight: 600, fontSize: "0.875rem" }}>{formatCurrency(txn.amount)} (Adj)</span> : <span style={{ color: "#94A3B8", fontSize: "0.875rem" }}>—</span>}
                 </td>
                 <td style={{ textAlign: "right" }}>
-                  <span style={{ fontWeight: 700, color: Number(txn.runningBalance) >= 0 ? "#DC2626" : "#059669", fontSize: "0.875rem" }}>
+                  <span style={{ fontWeight: 700, color: Number(txn.runningBalance) >= 0 ? "#9333EA" : "#059669", fontSize: "0.875rem" }}>
                     {formatCurrency(Math.abs(Number(txn.runningBalance)))} {Number(txn.runningBalance) >= 0 ? "Dr" : "Cr"}
                   </span>
                 </td>
@@ -341,14 +358,21 @@ function TransactionTable({ transactions, customerId, onUpdate, onEdit }: { tran
           <div key={txn.id} style={{ padding: "16px", borderBottom: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", opacity: txn.isDeleted ? 0.5 : 1 }}>
             <div>
               <p style={{ fontSize: "0.75rem", color: "#64748B", marginBottom: "4px" }}>{formatDate(txn.date)}</p>
-              <p style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 600 }}>{txn.description}</p>
+              <p style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 600 }}>
+                {txn.items && txn.items.length > 0 ? "Sale" : txn.description}
+              </p>
+              {txn.items && txn.items.length > 0 && txn.items.map(item => (
+                <p key={item.id} style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                  • {item.item?.name || "Item"} — {Number(item.quantity)} {item.unit} @ {formatCurrency(Number(item.rate))}
+                </p>
+              ))}
               {txn.referenceNumber && <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>#{txn.referenceNumber}</p>}
             </div>
             <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
               <span style={{ fontWeight: 700, fontSize: "1rem", color: txn.type === "SALE" ? "#4F46E5" : txn.type === "PAYMENT" ? "#059669" : "#D97706" }}>
                 {txn.type === "SALE" ? "" : txn.type === "PAYMENT" ? "-" : ""}{formatCurrency(txn.amount)}
               </span>
-              <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 500 }}>Bal: {formatCurrency(Math.abs(Number(txn.runningBalance)))}</span>
+              <span style={{ fontSize: "0.75rem", color: Number(txn.runningBalance) >= 0 ? "#9333EA" : "#059669", fontWeight: 500 }}>Bal: {formatCurrency(Math.abs(Number(txn.runningBalance)))}</span>
               {!txn.isDeleted && (
                 <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
                   <button onClick={() => onEdit(txn)} className="btn-icon-edit" title="Edit transaction">

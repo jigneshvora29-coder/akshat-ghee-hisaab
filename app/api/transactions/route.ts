@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
     ...(type && type !== "all" && { type: type as "SALE" | "PAYMENT" | "ADJUSTMENT" }),
     ...(startDate || endDate
       ? {
-          date: {
-            ...(startDate && { gte: new Date(startDate) }),
-            ...(endDate && { lte: new Date(endDate) }),
-          },
-        }
+        date: {
+          ...(startDate && { gte: new Date(startDate) }),
+          ...(endDate && { lte: new Date(endDate) }),
+        },
+      }
       : {}),
     ...(search && {
       OR: [
@@ -54,8 +54,16 @@ export async function GET(request: NextRequest) {
       include: {
         customer: { select: { id: true, name: true, phone: true } },
         items: {
-          include: { item: true }
-        }
+          select: {
+            id: true,
+            itemId: true,
+            quantity: true,
+            rate: true,
+            total: true,
+            unit: true,
+            item: { select: { id: true, name: true, defaultUnit: true } },
+          },
+        },
       },
     }),
     (prisma.transaction as any).count({ where }),

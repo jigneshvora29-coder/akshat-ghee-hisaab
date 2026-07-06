@@ -14,60 +14,72 @@ export async function GET(request: NextRequest) {
   const todayStart = startOfDay(today);
   const todayEnd = endOfDay(today);
 
-  // Run sequentially to prevent connection pool exhaustion (EMAXCONNSESSION)
-  const todaySalesResult = await prisma.transaction.aggregate({
-    _sum: { amount: true },
-    where: { type: "SALE", isDeleted: false, date: { gte: todayStart, lte: todayEnd } },
+  // Run queries in parallel for better performance
+  const [
+    todaySalesResult,
+    todayPaymentsResult,
+    totalCustomers,
+    totalTransactions,
+    outstandingResult,
+    recentTransactions,
+    pendingCustomers
+  ] = await Promise.all([
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { type: "SALE", isDeleted: false, date: { gte: todayStart, lte: todayEnd } },
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { type: "PAYMENT", isDeleted: false, date: { gte: todayStart, lte: todayEnd } },
+    }),
+    prisma.customer.count({ where: { isDeleted: false } }),
+    prisma.transaction.count({ where: { isDeleted: false } }),
+    prisma.customer.aggregate({
+      _sum: { currentBalance: true },
+      where: { isDeleted: false, currentBalance: { gt: 0 } },
+    }),
+    prisma.transaction.findMany({
+      where: { isDeleted: false },
+      orderBy: { date: "desc" },
+      take: 10,
+      include: { customer: { select: { id: true, name: true } } },
+    }),
+    prisma.customer.findMany({
+      where: { isDeleted: false, currentBalance: { gt: 0 } },
+      orderBy: { currentBalance: "desc" },
+      take: 5,
+    })
+  ]);
+
+  // Aggregate monthly data in memory using a single query
+  const sixMonthsAgo = startOfMonth(subMonths(today, 5));
+  const recentTxns = await prisma.transaction.findMany({
+    where: { isDeleted: false, date: { gte: sixMonthsAgo } },
+    select: { type: true, amount: true, date: true }
   });
 
-  const todayPaymentsResult = await prisma.transaction.aggregate({
-    _sum: { amount: true },
-    where: { type: "PAYMENT", isDeleted: false, date: { gte: todayStart, lte: todayEnd } },
-  });
-
-  const totalCustomers = await prisma.customer.count({ where: { isDeleted: false } });
-  const totalTransactions = await prisma.transaction.count({ where: { isDeleted: false } });
-
-  const outstandingResult = await prisma.customer.aggregate({
-    _sum: { currentBalance: true },
-    where: { isDeleted: false, currentBalance: { gt: 0 } },
-  });
-
-  const recentTransactions = await prisma.transaction.findMany({
-    where: { isDeleted: false },
-    orderBy: { date: "desc" },
-    take: 10,
-    include: { customer: { select: { id: true, name: true } } },
-  });
-
-  const pendingCustomers = await prisma.customer.findMany({
-    where: { isDeleted: false, currentBalance: { gt: 0 } },
-    orderBy: { currentBalance: "desc" },
-    take: 5,
-  });
-
-  // Monthly data for last 6 months (sequential)
   const monthlyData = [];
   for (let i = 0; i < 6; i++) {
-    const date = subMonths(today, 5 - i);
-    const start = startOfMonth(date);
-    const end = endOfMonth(date);
-
-    const sales = await prisma.transaction.aggregate({
-      _sum: { amount: true },
-      where: { type: "SALE", isDeleted: false, date: { gte: start, lte: end } },
-    });
+    const d = subMonths(today, 5 - i);
+    const mStart = startOfMonth(d);
+    const mEnd = endOfMonth(d);
     
-    const payments = await prisma.transaction.aggregate({
-      _sum: { amount: true },
-      where: { type: "PAYMENT", isDeleted: false, date: { gte: start, lte: end } },
-    });
+    let mSales = 0;
+    let mPayments = 0;
+    
+    // Filter from the in-memory array
+    for (const txn of recentTxns) {
+      if (txn.date >= mStart && txn.date <= mEnd) {
+        if (txn.type === "SALE") mSales += Number(txn.amount);
+        if (txn.type === "PAYMENT") mPayments += Number(txn.amount);
+      }
+    }
 
     monthlyData.push({
-      month: format(date, "MMM yyyy"),
-      sales: Number(sales._sum.amount || 0),
-      payments: Number(payments._sum.amount || 0),
-      outstanding: Number(sales._sum.amount || 0) - Number(payments._sum.amount || 0),
+      month: format(d, "MMM yyyy"),
+      sales: mSales,
+      payments: mPayments,
+      outstanding: mSales - mPayments,
     });
   }
 

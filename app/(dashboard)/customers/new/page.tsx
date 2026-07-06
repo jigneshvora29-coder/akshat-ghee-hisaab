@@ -94,7 +94,7 @@ export default function NewCustomerPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "8px" }}>
-            <button type="submit" disabled={isSubmitting} className="btn-primary">
+            <button type="submit" disabled={isSubmitting} className="btn-primary" style={{ background: "#0284C7" }}>
               {isSubmitting ? <Loader2 style={{ width: "16px", height: "16px", animation: "spin 0.7s linear infinite" }} /> : <UserPlus style={{ width: "16px", height: "16px" }} />}
               {isSubmitting ? "Creating..." : "Create Customer"}
             </button>

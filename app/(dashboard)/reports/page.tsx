@@ -57,7 +57,7 @@ function ChartWidget({ title, renderChart }: { title: string, renderChart: (data
           ))}
         </div>
       </div>
-      
+
       {isLoading ? (
         <div style={{ height: "260px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Loader2 style={{ width: "24px", height: "24px", animation: "spin 1s linear infinite", color: "#94A3B8" }} />
@@ -203,7 +203,7 @@ export default function ReportsPage() {
                   <p style={{ color: "#0F172A", fontWeight: 800, fontSize: "1.5rem", lineHeight: 1.2 }}>{formatCurrency(data.outstanding)}</p>
                 </div>
                 <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#FEF2F2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <PieChartIcon style={{ width: "20px", height: "20px", color: "#DC2626" }} />
+                  <PieChartIcon style={{ width: "20px", height: "20px", color: "#9333EA" }} />
                 </div>
               </div>
             </div>
@@ -246,7 +246,7 @@ export default function ReportsPage() {
               <div style={{ padding: "24px" }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#0F172A", marginBottom: "16px" }}>Summary Analysis</h3>
                 <p style={{ color: "#64748B", fontSize: "0.875rem", lineHeight: 1.6 }}>
-                  During this period, your business generated <strong style={{ color: "#0F172A" }}>{formatCurrency(data.totalSales)}</strong> in sales and collected <strong style={{ color: "#0F172A" }}>{formatCurrency(data.totalPayments)}</strong> in payments. The total outstanding balance across all your customers currently stands at <strong style={{ color: "#DC2626" }}>{formatCurrency(data.outstanding)}</strong>.
+                  During this period, your business generated <strong style={{ color: "#0F172A" }}>{formatCurrency(data.totalSales)}</strong> in sales and collected <strong style={{ color: "#0F172A" }}>{formatCurrency(data.totalPayments)}</strong> in payments. The total outstanding balance across all your customers currently stands at <strong style={{ color: "#9333EA" }}>{formatCurrency(data.outstanding)}</strong>.
                 </p>
                 <div style={{ marginTop: "24px", padding: "16px", borderRadius: "12px", background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -260,7 +260,7 @@ export default function ReportsPage() {
                   <div style={{ width: "100%", height: "1px", background: "#E2E8F0" }} />
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "#0F172A" }}>Net Flow for Period</span>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 700, color: (data.totalSales - data.totalPayments) > 0 ? "#DC2626" : "#059669" }}>
+                    <span style={{ fontSize: "0.875rem", fontWeight: 700, color: (data.totalSales - data.totalPayments) > 0 ? "#9333EA" : "#059669" }}>
                       {(data.totalSales - data.totalPayments) > 0 ? "+" : ""}{formatCurrency(data.totalSales - data.totalPayments)}
                     </span>
                   </div>
@@ -290,7 +290,7 @@ export default function ReportsPage() {
                     </ResponsiveContainer>
                   )}
                 />
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ChartWidget
                     title="Cash Flow Trend"
@@ -316,15 +316,15 @@ export default function ReportsPage() {
                         <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
                           <defs>
                             <linearGradient id="outGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#DC2626" stopOpacity={0.12} />
-                              <stop offset="95%" stopColor="#DC2626" stopOpacity={0} />
+                              <stop offset="5%" stopColor="#9333EA" stopOpacity={0.12} />
+                              <stop offset="95%" stopColor="#9333EA" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                           <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94A3B8" }} />
                           <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
                           <Tooltip formatter={(v: unknown) => formatCurrency(v as number)} contentStyle={{ borderRadius: 12, border: "1px solid #E2E8F0" }} />
-                          <Area type="step" dataKey="outstandingFlow" name="Outstanding Flow" stroke="#DC2626" strokeWidth={2} fill="url(#outGrad)" />
+                          <Area type="step" dataKey="outstandingFlow" name="Outstanding Flow" stroke="#9333EA" strokeWidth={2} fill="url(#outGrad)" />
                         </AreaChart>
                       </ResponsiveContainer>
                     )}
@@ -355,7 +355,7 @@ export default function ReportsPage() {
                           </td>
                           <td style={{ textAlign: "right", fontSize: "0.875rem", color: "#64748B" }}>{formatCurrency(c.totalSales)}</td>
                           <td style={{ textAlign: "right", fontSize: "0.875rem", color: "#64748B" }}>{formatCurrency(c.totalPayments)}</td>
-                          <td style={{ textAlign: "right", fontSize: "0.875rem", fontWeight: 700, color: Number(c.balance) > 0 ? "#DC2626" : "#059669" }}>{formatCurrency(c.balance)}</td>
+                          <td style={{ textAlign: "right", fontSize: "0.875rem", fontWeight: 700, color: Number(c.balance) > 0 ? "#9333EA" : "#059669" }}>{formatCurrency(c.balance)}</td>
                         </tr>
                       ))
                     )}
@@ -388,7 +388,7 @@ export default function ReportsPage() {
                               {t.customer?.name}
                             </Link>
                           </td>
-                          <td style={{ textAlign: "right", fontSize: "0.875rem", fontWeight: 700, color: t.type === "SALE" ? "#DC2626" : "#059669" }}>
+                          <td style={{ textAlign: "right", fontSize: "0.875rem", fontWeight: 700, color: t.type === "SALE" ? "#4F46E5" : "#059669" }}>
                             {t.type === "SALE" ? "+" : "-"}{formatCurrency(t.amount)}
                           </td>
                         </tr>
